@@ -162,6 +162,159 @@ function getMessageIDStatus(appSid, messageID){
   req.send(params);
 }
 
+function getMessagesReport(appSid){
+   var req = createCORSRequest('POST',  url+'/GetMessagesReport'),
+      params = 'AppSid=' + appSid; // defined above
+
+  if (!req) {
+    alert('CORS not supported');
+    return;
+  }
+  // Create the callback:
+  req.onload = function() {
+    var text = req.responseText;
+    // var title = getTitle(text);
+    console.log(text);
+    alert('Response from CORS request to ' + url + ': ' + text);
+
+  };
+
+  req.onerror = function() {
+    alert('Woops, there was an error making the request.');
+  };
+  req.onreadystatechange = function() {
+    if (req.readyState != 4) return; // Not there yet
+    if (req.status != 200) {
+      console.log('fail');
+      return;
+    }
+    // Request successful, read the response
+     var resp = JSON.parse(req);
+    // var resp = req.responseText;
+    console.log(resp);
+    return resp.data;
+  }
+
+  req.setRequestHeader("Content-length", params.length);
+  req.setRequestHeader("Content-Type","application/json");
+  req.send(params);
+}
+
+function getMessagesDetails(appSid){
+   var req = createCORSRequest('POST',  url+'/GetMessagesDetails'),
+      params = 'AppSid=' + appSid; // defined above
+
+  if (!req) {
+    alert('CORS not supported');
+    return;
+  }
+  // Create the callback:
+  req.onload = function() {
+    var text = req.responseText;
+    // var title = getTitle(text);
+    console.log(text);
+    alert('Response from CORS request to ' + url + ': ' + text);
+
+  };
+
+  req.onerror = function() {
+    alert('Woops, there was an error making the request.');
+  };
+  req.onreadystatechange = function() {
+    if (req.readyState != 4) return; // Not there yet
+    if (req.status != 200) {
+      console.log('fail');
+      return;
+    }
+    // Request successful, read the response
+     var resp = JSON.parse(req);
+    // var resp = req.responseText;
+    console.log(resp);
+    return resp.data;
+  }
+
+  req.setRequestHeader("Content-length", params.length);
+  req.setRequestHeader("Content-Type","application/json");
+  req.send(params);
+}
+
+function getScheduled(appSid){
+   var req = createCORSRequest('POST',  url+'/GetScheduled'),
+      params = 'AppSid=' + appSid; // defined above
+
+  if (!req) {
+    alert('CORS not supported');
+    return;
+  }
+  // Create the callback:
+  req.onload = function() {
+    var text = req.responseText;
+    // var title = getTitle(text);
+    console.log(text);
+    alert('Response from CORS request to ' + url + ': ' + text);
+
+  };
+
+  req.onerror = function() {
+    alert('Woops, there was an error making the request.');
+  };
+  req.onreadystatechange = function() {
+    if (req.readyState != 4) return; // Not there yet
+    if (req.status != 200) {
+      console.log('fail');
+      return;
+    }
+    // Request successful, read the response
+     var resp = JSON.parse(req);
+    // var resp = req.responseText;
+    console.log(resp);
+    return resp.data;
+  }
+
+  req.setRequestHeader("Content-length", params.length);
+  req.setRequestHeader("Content-Type","application/json");
+  req.send(params);
+}
+
+function stopScheduled(appSid, messageID){
+   var req = createCORSRequest('POST',  url+'/StopScheduled'),
+      params = 'AppSid=' + appSid + '&' +
+                'MessageID=' + messageID; // defined above
+
+  if (!req) {
+    alert('CORS not supported');
+    return;
+  }
+  // Create the callback:
+  req.onload = function() {
+    var text = req.responseText;
+    // var title = getTitle(text);
+    console.log(text);
+    alert('Response from CORS request to ' + url + ': ' + text);
+
+  };
+
+  req.onerror = function() {
+    alert('Woops, there was an error making the request.');
+  };
+  req.onreadystatechange = function() {
+    if (req.readyState != 4) return; // Not there yet
+    if (req.status != 200) {
+      console.log('fail');
+      return;
+    }
+    // Request successful, read the response
+     var resp = JSON.parse(req);
+    // var resp = req.responseText;
+    console.log(resp);
+    return resp.data;
+  }
+
+  req.setRequestHeader("Content-length", params.length);
+  req.setRequestHeader("Content-Type","application/json");
+  req.send(params);
+}
+
 function test(){
   var request = new XMLHttpRequest();
 
