@@ -2,8 +2,21 @@
 <script src="jquery-1.11.3.min.js"></script>
 <script src="otsdc.js"></script>
 <body>
-	<button onclick="sendMessages('089655194977','test');">Send
+	<button onclick="send_msg();">Send
 		
 	</button>
 </body>
+<script type="text/javascript">
+	function send_msg(){
+		var obj = getBalance('cYWr62UeR6mbGZw6qHWUhiVX8z5ed', function() {
+			return this;
+    // "this" is the XHR object here!
+  
+
+    /* now do something with resp */
+  });
+		
+		alert(obj.MessageID);
+	}
+</script>
 </html>
