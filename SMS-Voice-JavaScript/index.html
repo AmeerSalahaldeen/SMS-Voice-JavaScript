@@ -7,16 +7,16 @@
 	</button>
 </body>
 <script type="text/javascript">
-	function send_msg(){
-		var obj = getBalance('cYWr62UeR6mbGZw6qHWUhiVX8z5ed', function() {
-			return this;
-    // "this" is the XHR object here!
-  
+	
 
-    /* now do something with resp */
-  });
-		
-		alert(obj.MessageID);
+	function send_msg(){
+		var response;
+		//send 
+		sendMessages('your appSid', '962789xxxxxx', 'Send Message', null, null,function() {
+			response = this;
+			console.log("response Object: " + response);
+			alert("MessageID: " + response.MessageID);
+  		});
 	}
 </script>
 </html>

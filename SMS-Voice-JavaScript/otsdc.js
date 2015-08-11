@@ -1,29 +1,12 @@
 var url = 'http://api.otsdc.com/rest/',
 	ACCOUNT='Account',
 	MESSAGES='Messages',
-	VOICE='Voice';
+	VOICE='Voice', 
+	EMAIL='Email',
+	VERIFY = 'Verify',
+	CHECKER='Checker';
 
- url = 'http://localhost/otsdc-api-test/api.php/send';
-    // appSid = 'cYWr62UeR6mbGZw6qHWUhiVX8z5ed';
 
-// function createRequest() {
-//   var result = null;
-//   if (window.XMLHttpRequest) {
-//     // FireFox, Safari, etc.
-//     result = new XMLHttpRequest();
-//     if (typeof result.overrideMimeType != 'undefined') {
-//       result.overrideMimeType('text/xml'); // Or anything else
-//     }
-//   }
-//   else if (window.ActiveXObject) {
-//     // MSIE
-//     result = new ActiveXObject("Microsoft.XMLHTTP");
-//   } 
-//   else {
-//     // No known mechanism -- consider aborting the application
-//   }
-//   return result;
-// }
 
 function createCORSRequest(method, url) {
   var xhr = new XMLHttpRequest();
@@ -43,19 +26,22 @@ function createCORSRequest(method, url) {
 
 function handlerResponse(req, callback){
 	if (req.readyState != 4) return; // Not there yet
-    if (req.status != 200) {
-      console.log('fail');
-      return;
-    }
+   
     if (req.readyState == 4){
+    	 if (req.status == 200) {
+		      var resp = JSON.parse(req.responseText);
+			    // var resp = req.responseText;
+			    console.log(resp.data);
+			    // alert(resp);
+			    // ... and use it as needed by your app.
+			    callback.apply(resp.data);
+		 }else {
+                // pass the error to the callback function
+                callback(xmlhttp.statusText);
+            }
     	// alert(req);
 	    // Request successful, read the response
-	    var resp = JSON.parse(req.responseText);
-	    // var resp = req.responseText;
-	    console.log(resp.data);
-	    // alert(resp);
-	    // ... and use it as needed by your app.
-	     callback.apply(resp.data);
+	    
     }
     
 }
@@ -189,48 +175,32 @@ function changeAppDefaultSenderID(appSid, senderID, callback){
 //end Account API
 
 //Messages API
-function sendMessages(appSid, recipient, body, callback){
+function sendMessages(appSid, recipient, body, senderID, priority, callback){
   var req = createCORSRequest('POST',  url+MESSAGES+'/Send'),
       params = 'AppSid=' + appSid + '&' +
                 'Recipient=' + recipient + '&' +
                 'Body=' + body; // defined above
 
+  if(senderID != undefined) params = params + "&SenderID="+senderID;
+  if(priority != undefined) params = params + "&Priority="+priority;
   if (!req) {
     alert('CORS not supported');
     return;
   }
-  // //Create the callback:
-  // req.onload = function() {
-  //   var resp = JSON.parse(req.responseText);
-	 //    // var resp = req.responseText;
-	 //    console.log(resp.data);
-	 //    // alert(resp);
-	 //    // ... and use it as needed by your app.
-	 //    return resp.data;
-  // };
-
   req.onerror = function() {
     alert('Woops, there was an error making the request.');
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
-
-  // req.open("POST", url + '/Send', true);
-  // req.setRequestHeader("Content-length", params.length);
-  // req.setRequestHeader("Access-Control-Allow-Headers", "*");
-  // req.setRequestHeader("Access-Control-Allow-Origin", "*");
-  // req.setRequestHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
   req.setRequestHeader("Content-Type","application/json");
-  // req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-  // req.setRequestHeader("Connection", "close");
   req.send(params);
 }
 
-function sendBulk(appSid, recipient, body, callback){
+function sendBulk(appSid, recipient, body, senderID, callback){
    var req = createCORSRequest('POST',  url+MESSAGES+'/SendBulk'),
       params = 'AppSid=' + appSid + '&' +
                 'Recipient=' + recipient.replace(' ','') + '&' +
                 'Body=' + body; // defined above
-
+  if(senderID != undefined) params = params + "&SenderID="+senderID;
   if (!req) {
     alert('CORS not supported');
     return;
@@ -264,10 +234,16 @@ function getMessageIDStatus(appSid, messageID, callback){
   req.send(params);
 }
 
-function getMessagesReport(appSid, callback){
+function getMessagesReport(appSid, dateFrom, dateTo, callback){
    var req = createCORSRequest('POST',  url+MESSAGES+'/GetMessagesReport'),
       params = 'AppSid=' + appSid; // defined above
 
+  if(dateFrom != undefined){
+    	params = params + '&DateFrom=' + dateFrom;
+    }
+  if(dateTo != undefined){
+    	params = params + '&DateTo=' + dateTo;
+    }
   if (!req) {
     alert('CORS not supported');
     return;
@@ -282,10 +258,17 @@ function getMessagesReport(appSid, callback){
   req.send(params);
 }
 
-function getMessagesDetails(appSid, callback){
+function getMessagesDetails(appSid, messageID, status, senderID, dateFrom, dateTo, limit, page, callback){
    var req = createCORSRequest('POST',  url+MESSAGES+'/GetMessagesDetails'),
       params = 'AppSid=' + appSid; // defined above
 
+   if(messageID != undefined) params = params + '&MessageID=' + messageID;
+   if(status != undefined) params = params + '&status=' + status;
+   if(senderID != undefined) params = params + '&SenderID=' + senderID;
+   if(dateFrom != undefined) params = params + '&DateFrom=' + dateFrom;
+   if(dateTo != undefined) params = params + '&DateTo=' + dateTo;
+   if(limit != undefined) params = params + '&limit=' + limit;
+   if(page != undefined) params = params + '&page=' + page;
   if (!req) {
     alert('CORS not supported');
     return;
@@ -300,10 +283,11 @@ function getMessagesDetails(appSid, callback){
   req.send(params);
 }
 
-function getScheduled(appSid, callback){
+function getScheduled(appSid, messageID, callback){
    var req = createCORSRequest('POST',  url+MESSAGES+'/GetScheduled'),
       params = 'AppSid=' + appSid; // defined above
 
+  if(messageID != undefined) params = params + '&MessageID=' + messageID;
   if (!req) {
     alert('CORS not supported');
     return;
@@ -488,22 +472,96 @@ function stopScheduled(appSid, callID, callback){
 }
 //end Voice API
 
-function test(){
-  var request = new XMLHttpRequest();
+//Email API
+function sendEmail(appSid, recipient, from, body, callback){
+   var req = createCORSRequest('POST',  url+EMAIL+'/Send'),
+      params = 'AppSid=' + appSid + '&Recipient=' + recipient + '&From=' + from + '&Body=' + body;
 
-  request.open('POST', 'http://api.otsdc.com/rest/Account/GetBalance');
+  if (!req) {
+    alert('CORS not supported');
+    return;
+  }
 
-  request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-  request.onreadystatechange = function () {
-    if (this.readyState === 4) {
-      console.log('Status:', this.status);
-      console.log('Headers:', this.getAllResponseHeaders());
-      console.log('Body:', this.responseText);
-    }
+  req.onerror = function() {
+    alert('Woops, there was an error making the request.');
   };
+  req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  var body = "AppSid=Add Yor Own AppSid";
-
-  request.send(body);
+  req.setRequestHeader("Content-Type","application/json");
+  req.send(params);
 }
+
+function getEmailsReport(appSid, callback){
+   var req = createCORSRequest('POST',  url+EMAIL+'/GetEmailsReport'),
+      params = 'AppSid=' + appSid;
+
+  if (!req) {
+    alert('CORS not supported');
+    return;
+  }
+
+  req.onerror = function() {
+    alert('Woops, there was an error making the request.');
+  };
+  req.onreadystatechange = function() {handlerResponse(req, callback);};
+
+  req.setRequestHeader("Content-Type","application/json");
+  req.send(params);
+}
+//Verify API
+function getCode(appSid, recipient, body, callback){
+   var req = createCORSRequest('POST',  url+VERIFY+'/GetCode'),
+      params = 'AppSid=' + appSid + '&Recipient=' + recipient + '&Body=' + body;
+
+  if (!req) {
+    alert('CORS not supported');
+    return;
+  }
+
+  req.onerror = function() {
+    alert('Woops, there was an error making the request.');
+  };
+  req.onreadystatechange = function() {handlerResponse(req, callback);};
+
+  req.setRequestHeader("Content-Type","application/json");
+  req.send(params);
+}
+
+function verifyNumber(appSid, recipient, passCode, callback){
+   var req = createCORSRequest('POST',  url+VERIFY+'/VerifyNumber'),
+      params = 'AppSid=' + appSid + '&Recipient=' + recipient + '&PassCode=' + passCode;
+
+  if (!req) {
+    alert('CORS not supported');
+    return;
+  }
+
+  req.onerror = function() {
+    alert('Woops, there was an error making the request.');
+  };
+  req.onreadystatechange = function() {handlerResponse(req, callback);};
+
+  req.setRequestHeader("Content-Type","application/json");
+  req.send(params);
+}
+//
+
+//Checker API
+function checkNumber(appSid, recipient, callback){
+   var req = createCORSRequest('POST',  url+CHECKER+'/CheckNumber'),
+      params = 'AppSid=' + appSid + '&Recipient=' + recipient;
+
+  if (!req) {
+    alert('CORS not supported');
+    return;
+  }
+
+  req.onerror = function() {
+    alert('Woops, there was an error making the request.');
+  };
+  req.onreadystatechange = function() {handlerResponse(req, callback);};
+
+  req.setRequestHeader("Content-Type","application/json");
+  req.send(params);
+}
+//
