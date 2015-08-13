@@ -1,5 +1,4 @@
 <html>
-<script src="jquery-1.11.3.min.js"></script>
 <script src="otsdc.js"></script>
 <body>
 	<button onclick="send_msg();">Send
@@ -12,10 +11,15 @@
 	function send_msg(){
 		var response;
 		//send 
-		sendMessages('your appSid', '962789xxxxxx', 'Send Message', null, null,function() {
+		call('cYWr62UeR6mbGZw6qHWUhiVX8z5ed', '962789309519', 'https://voiceusa.s3.amazonaws.com/voiceWavFiles1423399184883.wav', null, null,function() {
 			response = this;
-			console.log("response Object: " + response);
-			alert("MessageID: " + response.MessageID);
+			console.log(response);
+			if(response.isSuccess){
+				alert("success: " + response.CallStatus);
+			} else{
+				alert("Error: " + response.message);
+			}
+			
   		});
 	}
 </script>

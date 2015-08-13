@@ -28,17 +28,38 @@ function handlerResponse(req, callback){
 	if (req.readyState != 4) return; // Not there yet
    
     if (req.readyState == 4){
-    	 if (req.status == 200) {
-		      var resp = JSON.parse(req.responseText);
-			    // var resp = req.responseText;
-			    console.log(resp.data);
-			    // alert(resp);
-			    // ... and use it as needed by your app.
-			    callback.apply(resp.data);
-		 }else {
-                // pass the error to the callback function
-                callback(xmlhttp.statusText);
-            }
+      var resp = JSON.parse(req.response);
+      
+    	if (req.status == 200) {
+        var res = resp.data;
+        Object.defineProperty(res, 'isSuccess', {
+          get: function() {
+            return isSuccess;
+          },
+          set: function(value) {
+            isSuccess = value;
+          }
+        });
+	      res.isSuccess = true;
+		    // console.log(res);
+		    
+		    // ... and use it as needed by your app.
+		    callback.apply(res);
+		  }else {
+        // pass the error to the callback function
+        Object.defineProperty(resp, 'isSuccess', {
+          get: function() {
+            return isSuccess;
+          },
+          set: function(value) {
+            isSuccess = value;
+          }
+        });
+        resp.isSuccess = false;
+        // console.log(resp);
+        callback.apply(resp);
+        // console.log(req);
+      }
     	// alert(req);
 	    // Request successful, read the response
 	    
@@ -61,7 +82,7 @@ function getBalance(appSid, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -79,7 +100,7 @@ function addSenderID(appSid, senderID, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -97,7 +118,7 @@ function getSenderIDStatus(appSid, senderID, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -115,7 +136,7 @@ function getSenderIDs(appSid, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -133,7 +154,7 @@ function deleteSenderID(appSid, senderID, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -151,7 +172,7 @@ function getAppDefaultSenderID(appSid, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -169,17 +190,18 @@ function changeAppDefaultSenderID(appSid, senderID, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 //end Account API
 
 //Messages API
 function sendMessages(appSid, recipient, body, senderID, priority, callback){
+  
   var req = createCORSRequest('POST',  url+MESSAGES+'/Send'),
       params = 'AppSid=' + appSid + '&' +
                 'Recipient=' + recipient + '&' +
-                'Body=' + body; // defined above
+                'Body=' + encodeURIComponent(body); // defined above
 
   if(senderID != undefined) params = params + "&SenderID="+senderID;
   if(priority != undefined) params = params + "&Priority="+priority;
@@ -191,7 +213,7 @@ function sendMessages(appSid, recipient, body, senderID, priority, callback){
     alert('Woops, there was an error making the request.');
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -199,7 +221,7 @@ function sendBulk(appSid, recipient, body, senderID, callback){
    var req = createCORSRequest('POST',  url+MESSAGES+'/SendBulk'),
       params = 'AppSid=' + appSid + '&' +
                 'Recipient=' + recipient.replace(' ','') + '&' +
-                'Body=' + body; // defined above
+                'Body=' + encodeURIComponent(body); // defined above
   if(senderID != undefined) params = params + "&SenderID="+senderID;
   if (!req) {
     alert('CORS not supported');
@@ -211,7 +233,7 @@ function sendBulk(appSid, recipient, body, senderID, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -230,7 +252,7 @@ function getMessageIDStatus(appSid, messageID, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -254,7 +276,7 @@ function getMessagesReport(appSid, dateFrom, dateTo, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -279,7 +301,7 @@ function getMessagesDetails(appSid, messageID, status, senderID, dateFrom, dateT
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -298,7 +320,7 @@ function getScheduled(appSid, messageID, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -317,16 +339,17 @@ function stopScheduled(appSid, messageID, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 //end Message API
 
 //Voice API
-function call(appSid, recipient, callType, timeScheduled, callback){
-   var req = createCORSRequest('POST',  url+VOICE+'/StopScheduled'),
+function call(appSid, recipient, content, callType, timeScheduled, callback){
+   var req = createCORSRequest('POST',  url+VOICE+'/Call'),
       params = 'AppSid=' + appSid +
-                '&Recipient=' + recipient;
+                '&Recipient=' + recipient +
+                '&Content=' + encodeURIComponent(content);
 
     if(callType != undefined){
     	params = params + '&CallType=' + callType;
@@ -345,7 +368,7 @@ function call(appSid, recipient, callType, timeScheduled, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -364,7 +387,7 @@ function getCallIDStatus(appSid, callID, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -398,13 +421,13 @@ function getCallsDetails(appSid, callID, dateFrom, dateTo, status, country, call
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
 function TTSCall(appSid, recipient, content, language, callType, timeScheduled, callback){
    var req = createCORSRequest('POST',  url+VOICE+'/TTSCall'),
-      params = 'AppSid=' + appSid + '&Recipient=' + recipient + '&Content=' + content + '&Language=' + language;
+      params = 'AppSid=' + appSid + '&Recipient=' + recipient + '&Content=' + encodeURIComponent(content) + '&Language=' + language;
 
     if(callType != undefined){
     	params = params + '&CallType=' + callType;
@@ -423,7 +446,7 @@ function TTSCall(appSid, recipient, content, language, callType, timeScheduled, 
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -445,7 +468,7 @@ function getScheduled(appSid, callID, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -467,7 +490,7 @@ function stopScheduled(appSid, callID, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 //end Voice API
@@ -475,7 +498,7 @@ function stopScheduled(appSid, callID, callback){
 //Email API
 function sendEmail(appSid, recipient, from, body, callback){
    var req = createCORSRequest('POST',  url+EMAIL+'/Send'),
-      params = 'AppSid=' + appSid + '&Recipient=' + recipient + '&From=' + from + '&Body=' + body;
+      params = 'AppSid=' + appSid + '&Recipient=' + recipient + '&From=' + from + '&Body=' + encodeURIComponent(body);
 
   if (!req) {
     alert('CORS not supported');
@@ -487,7 +510,7 @@ function sendEmail(appSid, recipient, from, body, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -505,13 +528,13 @@ function getEmailsReport(appSid, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 //Verify API
 function getCode(appSid, recipient, body, callback){
    var req = createCORSRequest('POST',  url+VERIFY+'/GetCode'),
-      params = 'AppSid=' + appSid + '&Recipient=' + recipient + '&Body=' + body;
+      params = 'AppSid=' + appSid + '&Recipient=' + recipient + '&Body=' + encodeURIComponent(body);
 
   if (!req) {
     alert('CORS not supported');
@@ -523,7 +546,7 @@ function getCode(appSid, recipient, body, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 
@@ -541,7 +564,7 @@ function verifyNumber(appSid, recipient, passCode, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 //
@@ -561,7 +584,7 @@ function checkNumber(appSid, recipient, callback){
   };
   req.onreadystatechange = function() {handlerResponse(req, callback);};
 
-  req.setRequestHeader("Content-Type","application/json");
+  req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
   req.send(params);
 }
 //

@@ -18,31 +18,49 @@ Here is the example to Use Message API
 
 		sendMessages('your appSid', '962789xxxxxx', 'Send Message', null, null, function() {
 			response = this;
-			console.log("response Object: " + response);
-			alert("MessageID: " + response.MessageID);
+			console.log(response);
+			if(response.isSuccess){
+				alert("MessageID: " + response.MessageID);
+			} else{
+				alert("Error: " + response.message);
+			}
+			
   		});
 	}
 
 	function send_bulk(){
 		sendBulk('your appSid', ['962789xxxxxx','962738xxxxxx'], 'Send Message', null, function() {
 			response = this;
-			console.log("response Object: " + response);
+			console.log(response);
+			if(response.isSuccess){
+				alert("MessageID: " + response.MessageID);
+			} else{
+				alert("Error: " + response.message);
+			}
   		});
 	}
 
 	function get_messageID_status(){
 		getMessageIDStatus('your appSid', '65432', function() {
 			response = this;
-			console.log("response Object: " + response);
-			alert("Status: " + response.Status);
+			console.log(response);
+			if(response.isSuccess){
+				alert("MessageID: " + response.Status);
+			} else{
+				alert("Error: " + response.message);
+			}
   		});
 	}
 
 	function get_message_report(){
 		getMessagesReport('your appSid', null, null, function() {
 			response = this;
-			console.log("response Object: " + response);
-			alert("TotalTextMessages: " + response.TotalTextMessages);
+			console.log(response);
+			if(response.isSuccess){
+				alert("MessageID: " + response.Status);
+			} else{
+				alert("Error: " + response.message);
+			}
   		});
 	}
 </script>
