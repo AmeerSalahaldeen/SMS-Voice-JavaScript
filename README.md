@@ -1,5 +1,5 @@
 # REST API for JavaScript
-A simple HTTP based RESTful API library will enable your apps to send emails and sms messages, make phone calls, and setup two-factor authentication through OTS Cloud Communication Platform
+A simple HTTP based RESTful API library will enable your apps to send text messages and make phone calls through [Unifonic Cloud Communication Platform] (http://www.unifonic.com)
 
 ## Installation
 
